@@ -129,7 +129,9 @@ class Miraibot
     uri = URI.parse(@urli+"/recall")
     return post uri,data
   end
+
   #文件操作
+
   def fileList id,path="",target=nil,group=nil,qq=nil,withDownloadInfo=nil,offset=nil,size=nil  
   data = {
     :sessionKey=>@sessionKey,
@@ -226,7 +228,6 @@ class Miraibot
 
   #多媒体内容上传 TODO
 
-  
 
   #账号管理
 
@@ -333,7 +334,7 @@ class Miraibot
   
   #TODO 事件处理
 
-
+  
   #TODO 命令
 
 
