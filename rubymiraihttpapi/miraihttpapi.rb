@@ -10,6 +10,10 @@ class Miraibot
     puts @urli
   end
 
+  def qq
+    @qq
+  end
+
   def about
     url = @urli+"/about"
     uri = URI.parse(url)
@@ -25,10 +29,11 @@ class Miraibot
   end
   
   def bind qq
+    @qq = qq
     if @sessionKey == "SINGLE_SESSION"
       return
     end
-    data = {:sessionkey=>@sessionKey,:qq=>qq}
+    data = {:sessionkey=>@sessionKey,:qq=>@qq}
     uri = URI.parse(@urli+"/bind")
     return post uri,data
   end
@@ -187,7 +192,7 @@ class Miraibot
     return post uri,data
   end
 
-  def fileDelete id,path="",target=nil,group=nil,qq=nil, 
+  def fileDelete id,path="",target=nil,group=nil,qq=nil
     data = {
       :sessionKey=>@sessionKey,
       :id=>id,:path=>path,
@@ -199,7 +204,7 @@ class Miraibot
     return post uri,data
   end
 
-  def fileMove id,moveTo=nil,path,moveToPath=nil,target=nil,group=nil,qq=nil, 
+  def fileMove id,moveTo=nil,path="",moveToPath=nil,target=nil,group=nil,qq=nil
     data = {
       :sessionKey=>@sessionKey,
       :id=>id,:path=>path,
@@ -213,14 +218,14 @@ class Miraibot
     return post uri,data
   end
   
-  def fileRename id,renameTo=nil,path,target=nil,group=nil,qq=nil, 
+  def fileRename id,renameTo=nil,path="",target=nil,group=nil,qq=nil, 
     data = {
       :sessionKey=>@sessionKey,
       :id=>id,:path=>path,
       :target=>target,
       :group=>group,
       :qq=>qq,
-      :renameTo
+      :renameTo=>renameTo
     }
     uri = URI.parse(@urli+"/file/rename")
     return post uri,data
@@ -334,7 +339,7 @@ class Miraibot
   
   #TODO 事件处理
 
-  
+
   #TODO 命令
 
 
