@@ -6,14 +6,14 @@ bot = Miraibot.new 'localhost',8080
 bot.verify 'abc'
 
 path = File.join(File.dirname(__FILE__), 'config.toml')
-config = TomlRB.load_file(path)
+pp config = TomlRB.load_file(path)
 
-bot.bind config["bot"]
-bot.setAdmin config["admin"]
+bot.bind config["bot"].to_i
+bot.setAdmin config["admin"].to_i
 
 
 def nudge msg,bot
-  if msg["target"] == bot.qq and msg["fromId"] != bot.qq
+  if msg["target"] == bot.qq or msg["target"] == bot.admin and msg["fromId"] != bot.qq
     bot.sendNudge msg["fromId"],msg["subject"]["id"],msg["subject"]["kind"]
   end
 end
@@ -33,8 +33,21 @@ class Botgroupmsg
           begin 
           bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"https://www.dmoe.cc/random.php" }]
           end
-        
         end
+        
+        if smsg["text"] =~ /\/fudu/
+          pp msg["sender"]["group"]["id"]
+          commandh = smsg["text"].split(pattern=" ")
+          begin
+            commandh[2].to_i.times do
+              begin 
+              bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
+              end
+            end
+          end
+        end
+        
+        
       end
     end
   end

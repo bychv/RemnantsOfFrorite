@@ -20,7 +20,7 @@ class Miraibot
   end
 
   def setAdmin admin 
-    @admin
+    @admin = admin
   end
 
   def about
