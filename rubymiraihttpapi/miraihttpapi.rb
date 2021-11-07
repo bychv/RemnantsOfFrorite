@@ -10,8 +10,17 @@ class Miraibot
     puts @urli
   end
 
+  #setter and getter
   def qq
     @qq
+  end
+
+  def admin
+    @admin
+  end
+
+  def setAdmin admin 
+    @admin
   end
 
   def about

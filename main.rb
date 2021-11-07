@@ -1,8 +1,16 @@
+require 'toml-rb'
 require './rubymiraihttpapi/miraihttpapi.rb'
+
 
 bot = Miraibot.new 'localhost',8080
 bot.verify 'abc'
-bot.bind 
+
+path = File.join(File.dirname(__FILE__), 'config.toml')
+config = TomlRB.load_file(path)
+
+bot.bind config["bot"]
+bot.setAdmin config["admin"]
+
 
 def nudge msg,bot
   if msg["target"] == bot.qq and msg["fromId"] != bot.qq
@@ -18,12 +26,20 @@ class Botgroupmsg
           pp msg["sender"]["group"]["id"]
           begin 
           bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>"https://www.dmoe.cc/random.php" }]
-
           end
+        end
+        if smsg["text"] == "/picsource" 
+          pp msg["sender"]["group"]["id"]
+          begin 
+          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"https://www.dmoe.cc/random.php" }]
+          end
+        
         end
       end
     end
   end
+
+  
 end
 
 def botthings bot,resp
@@ -48,5 +64,5 @@ while true
 resp = bot.fetchMessage 10
 resp['data'].uniq!
 botthings bot,resp
-sleep(1)
+sleep(0.5)
 end
