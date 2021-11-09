@@ -2,12 +2,12 @@ require 'toml-rb'
 require './rubymiraihttpapi/miraihttpapi.rb'
 require './botdo.rb'
 
-
-bot = Miraibot.new 'localhost',8080
-bot.verify 'abc'
-
 path = File.join(File.dirname(__FILE__), 'config.toml')
 pp config = TomlRB.load_file(path)
+
+bot = Miraibot.new 'localhost',8080
+bot.verify config['verify']
+
 
 bot.bind config["bot"].to_i
 bot.setAdmin config["admin"].to_i
@@ -25,9 +25,9 @@ class Botgroupmsg
     mscindex = 0
     
     msg["messageChain"].each do |smsg|
-      
+      botdo = Botdo.new bot,msg,smsg
       if smsg["type"] == "Plain"
-        Botdo.grpmsghadle msg,smsg,bot
+        botdo.grpmsghadle
         
         #FUDU
         if smsg["text"] =~ /\/fudu/   
@@ -50,8 +50,10 @@ class Botgroupmsg
               commandh[2].to_i.times do |i|
                 begin 
                   ha[i] = Thread.new do
+                    Async do
                     bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
-                    Botdo.grpmsghadle msg,smsg,bot
+                    end
+                    botdo.grpmsghadle 
                   rescue
                     bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
                   end
@@ -83,12 +85,23 @@ class Botgroupmsg
         end
       end
       mscindex += 1
+
+      if smsg["type"] == "Image" 
+        begin
+          if msg["sender"]["id"] == 3492132882
+          Async do
+            botdo.imagedl smsg["url"],smsg["imageId"]
+          end
+          end
+        rescue 
+          pp $!
+        end
+        pp smsg["url"]
+      end
+  
     end
 
-    if msg["type"] == "Image"
-      
-    end
-
+    
 
   end
 
