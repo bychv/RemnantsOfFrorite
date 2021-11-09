@@ -318,7 +318,7 @@ class Miraibot
 
   def getMemberInfo target,memberId
     uri = URI.parse(@urli+"/memberInfo?sessionKey=#{@sessionKey}&target=#{target}&memberId=#{memberId}")
-    return get uri,data
+    return get uri,{}
   end
 
   def setMemberInfo target,memberId,name,specialTitle

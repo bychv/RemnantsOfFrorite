@@ -1,5 +1,6 @@
 require 'toml-rb'
 require './rubymiraihttpapi/miraihttpapi.rb'
+require './botdo.rb'
 
 
 bot = Miraibot.new 'localhost',8080
@@ -19,37 +20,76 @@ def nudge msg,bot
 end
 
 class Botgroupmsg
-  def self.picture msg,bot
+  @picsource = "https://acg.toubiec.cn/random.php"
+  def self.msgtype msg,bot
+    mscindex = 0
+    
     msg["messageChain"].each do |smsg|
+      
       if smsg["type"] == "Plain"
-        if smsg["text"] == "kkp"
-          pp msg["sender"]["group"]["id"]
-          begin 
-          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>"https://www.dmoe.cc/random.php" }]
-          end
-        end
-        if smsg["text"] == "/picsource" 
-          pp msg["sender"]["group"]["id"]
-          begin 
-          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"https://www.dmoe.cc/random.php" }]
-          end
-        end
+        Botdo.grpmsghadle msg,smsg,bot
         
-        if smsg["text"] =~ /\/fudu/
+        #FUDU
+        if smsg["text"] =~ /\/fudu/   
           pp msg["sender"]["group"]["id"]
           commandh = smsg["text"].split(pattern=" ")
           begin
-            commandh[2].to_i.times do
-              begin 
-              bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
+            
+            if   msg["sender"]["id"] != true and commandh[2].to_i > 10
+              begin
+                
+                bot.sendGroupMessage msg["sender"]["group"]["id"],[ {"type"=>"At", "target"=>msg["sender"]["id"], "display"=>""},{ "type"=>"Plain", "text"=>" Permission Denied" }]
+              rescue
+                bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+              
               end
+          else  
+            
+            begin
+              ha = Array.new(commandh[2].to_i)
+              commandh[2].to_i.times do |i|
+                begin 
+                  ha[i] = Thread.new do
+                    bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
+                    Botdo.grpmsghadle msg,smsg,bot
+                  rescue
+                    bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+                  end
+                end
+                sleep 0.5
+              end
+              ha.each do |i|
+                #i.join
+              end
+              rescue
+                bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
             end
           end
+        rescue
+          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+        end
+
         end
         
-        
       end
+      #At
+      if smsg["type"] == "At" and smsg["target"] == bot.qq and msg["sender"]["id"] == bot.admin
+        begin
+          #asw smsg[mscindex+1]["text"]
+          bot.sendGroupMessage msg["sender"]["group"]["id"],[ {"type"=>"At", "target"=>msg["sender"]["id"], "display"=>""},{ "type"=>"Plain", "text"=>" 爪巴😅" }]
+        rescue
+          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+          
+        end
+      end
+      mscindex += 1
     end
+
+    if msg["type"] == "Image"
+      
+    end
+
+
   end
 
   
@@ -64,7 +104,7 @@ def botthings bot,resp
     end
 
     if msg["type"] == "GroupMessage"
-      Botgroupmsg.picture msg,bot
+      Botgroupmsg.msgtype msg,bot
     end
   end
 
