@@ -1,7 +1,11 @@
 require 'net/http'
+require 'json'
 require 'async'
 
+require './bychvsec.rb'
+
 class Botdo
+  include Bychv
   def initialize bot,msg,smsg
     @bot = bot
     @msg = msg 
@@ -9,29 +13,100 @@ class Botdo
   end
 
 
-  def grpmsghadle 
-    picsource = "https://acg.toubiec.cn/random.php"
-    
-    if @smsg["text"] =~ /kkp/
+  def grpmsghadle smsg = @smsg
+    picsource = "https://pximg.rainchan.win/rawimg"
+    pixivapi = "https://pximg.rainchan.win"
+    pp smsg
+    Async do 
+    if smsg["text"] =~ /kkp/
       pp @msg["sender"]["group"]["id"]
       begin 
         #bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>n.to_s }]
           Async do |task|
             task.async do 
-              @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>picsource }]
+              @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>Bychv.getpicsource }]
             end
           end
+      rescue 
+        @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s}]
       end
     end
-    if @smsg["text"] == "/picsource" 
+    end #of async
+    if smsg["text"] == "/picsource" 
       pp @msg["sender"]["group"]["id"]
       begin 
       @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>picsource }]
       end
     end
 
-    
+    if smsg["text"] =~ /\/fudu/
+      Thread.new do
+        fudu smsg
+      end
+    end
+
+    if smsg["text"] =~ /^pixiv/
+      Async do
+        pixivimg
+      end
+      
+    end
   end
+  
+  def fudu smsg 
+    if smsg != @smsg then return end
+    begin
+    pp @msg["sender"]["group"]["id"]
+    command = smsg['text'].split
+    if command.size >= 3 and command[-1].to_i < 10
+      n = command[-1].to_i
+      command.delete_at -1
+      command.delete_at 0
+      str_to_sent = command.join(sep=" ")
+      msga = {"type"=>"Plain","text"=>str_to_sent}
+      Async do
+        n.times do
+          
+          Async do
+            @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>str_to_sent }]
+            pp grpmsghadle msga
+            
+          end
+        end # of times do
+      end #of Async do 1
+    end #of if
+
+    rescue
+      @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+    end #of begin...rescue...
+  end #end of fudu
+  
+  def pixivimg
+    begin
+      id = @smsg["text"].split[1]
+      url = "https://pximg.rainchan.win/imginfo?img_id="+id
+      uri = URI.parse(url)
+      resp = Net::HTTP.get(uri)
+      pinfo = JSON.parse(resp)
+      pinfo["tags"]['tags'].each do |i|
+        if i['tag'] =~ /R-18/i
+          @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"不许色色" }]
+          return
+        end
+      end
+
+
+
+      @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>"https://pximg.rainchan.win/img?img_id="+id.to_s }]
+
+      
+    rescue 
+      @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+    end
+  end
+
+
+
 
   def imagedl uri,imgid
     imgid =~ /\{(.*)\}/ 

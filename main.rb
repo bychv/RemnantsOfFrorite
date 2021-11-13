@@ -21,57 +21,59 @@ end
 
 class Botgroupmsg
   @picsource = "https://acg.toubiec.cn/random.php"
-  def self.msgtype msg,bot
+  def self.msgtype msg,bot,config
     mscindex = 0
     
     msg["messageChain"].each do |smsg|
       botdo = Botdo.new bot,msg,smsg
       if smsg["type"] == "Plain"
-        botdo.grpmsghadle
+        Async do
+        botdo.grpmsghadle 
+        end
         
         #FUDU
-        if smsg["text"] =~ /\/fudu/   
-          pp msg["sender"]["group"]["id"]
-          commandh = smsg["text"].split(pattern=" ")
-          begin
-            
-            if   msg["sender"]["id"] != true and commandh[2].to_i > 10
-              begin
-                
-                bot.sendGroupMessage msg["sender"]["group"]["id"],[ {"type"=>"At", "target"=>msg["sender"]["id"], "display"=>""},{ "type"=>"Plain", "text"=>" Permission Denied" }]
-              rescue
-                bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
-              
-              end
-          else  
-            
-            begin
-              ha = Array.new(commandh[2].to_i)
-              commandh[2].to_i.times do |i|
-                begin 
-                  ha[i] = Thread.new do
-                    Async do
-                    bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
-                    end
-                    botdo.grpmsghadle 
-                  rescue
-                    bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
-                  end
-                end
-                sleep 0.5
-              end
-              ha.each do |i|
-                #i.join
-              end
-              rescue
-                bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
-            end
-          end
-        rescue
-          bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
-        end
+        #if smsg["text"] =~ /\/fudu/   
+        #  pp msg["sender"]["group"]["id"]
+        #  commandh = smsg["text"].split(pattern=/\s+/)
+        #  begin
+        #    
+        #    if   msg["sender"]["id"] != true and commandh[2].to_i > 10
+        #      begin
+        #        
+        #        bot.sendGroupMessage msg["sender"]["group"]["id"],[ {"type"=>"At", "target"=>msg["sender"]["id"], "display"=>""},{ "type"=>"Plain", "text"=>" Permission Denied" }]
+        #      rescue
+        #        bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+        #      
+        #      end
+        #  else  
+        #    
+        #     begin
+        #       ha = Array.new(commandh[2].to_i)
+        #       commandh[2].to_i.times do |i|
+        #         begin 
+        #           ha[i] = Thread.new do
+        #             #Async do
+        #             bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>commandh[1] }]
+        #             #end
+        #             botdo.grpmsghadle 
+        #           rescue
+        #             bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+        #           end
+        #         end
+        #         sleep 0.5
+        #       end
+        #       ha.each do |i|
+        #         #i.join
+        #       end
+        #       rescue
+        #         bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+        #     end
+        #   end
+        # rescue
+        #   bot.sendGroupMessage msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
+        # end
 
-        end
+        # end
         
       end
       #At
@@ -88,11 +90,12 @@ class Botgroupmsg
 
       if smsg["type"] == "Image" 
         begin
-          if msg["sender"]["id"] == 3492132882
           Async do
+          if msg["sender"]["id"] == config['imgdltarget']
             botdo.imagedl smsg["url"],smsg["imageId"]
           end
           end
+          
         rescue 
           pp $!
         end
@@ -108,7 +111,7 @@ class Botgroupmsg
   
 end
 
-def botthings bot,resp
+def botthings bot,resp,config
   resp['data'].uniq!
   pp resp
   resp['data'].each do |msg|
@@ -117,7 +120,7 @@ def botthings bot,resp
     end
 
     if msg["type"] == "GroupMessage"
-      Botgroupmsg.msgtype msg,bot
+      Botgroupmsg.msgtype msg,bot,config
     end
   end
 
@@ -129,6 +132,6 @@ end
 while true
 resp = bot.fetchMessage 10
 resp['data'].uniq!
-botthings bot,resp
+botthings bot,resp,config
 sleep(0.5)
 end
