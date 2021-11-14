@@ -16,7 +16,8 @@ class Botdo
   def grpmsghadle smsg = @smsg
     picsource = "https://pximg.rainchan.win/rawimg"
     pixivapi = "https://pximg.rainchan.win"
-    pp smsg
+    pp smsg["text"]
+    
     Async do 
     if smsg["text"] =~ /kkp/
       pp @msg["sender"]["group"]["id"]
@@ -49,8 +50,17 @@ class Botdo
       Async do
         pixivimg
       end
-      
     end
+
+    if smsg["text"][0]  == "透"
+      tt = smsg["text"]
+      tt[0] = ""
+      pp @msg["sender"]["group"]["id"]
+      begin 
+        @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>tt+"，透！！！" }]
+        end
+    end
+
   end
   
   def fudu smsg 
