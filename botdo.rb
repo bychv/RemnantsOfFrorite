@@ -61,6 +61,17 @@ class Botdo
         end
     end
 
+    if smsg["text"] == "/about"
+      rbver = "ruby #{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
+      pp miraiver = "mirai-http-api:"+@bot.version
+      @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"}]
+    end
+
+    if smsg["text"] =~ /^>电我.*下/
+      @bot.mute @msg["sender"]["group"]["id"],@msg["sender"]["id"],60
+      @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"电死你！"}]
+    end
+
   end
   
   def fudu smsg 

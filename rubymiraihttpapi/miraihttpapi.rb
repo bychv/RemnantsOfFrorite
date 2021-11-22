@@ -7,13 +7,16 @@ class Miraibot
     @host = host
     @port = port
     @urli = "http://#{host}:#{port}"
+    
     puts @urli
   end
 
   #setter and getter
   def qq
     @qq
+    
   end
+  
 
   def admin
     @admin
@@ -21,6 +24,11 @@ class Miraibot
 
   def setAdmin admin 
     @admin = admin
+    pp @version = about["data"]["version"]
+  end
+
+  def version
+    @version
   end
 
   def about
