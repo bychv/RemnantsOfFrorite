@@ -19,7 +19,7 @@ class Botdo
     pp smsg["text"]
     
     Async do 
-    if smsg["text"] =~ /kkp/
+    if smsg["text"] =~ /kkp/i
       pp @msg["sender"]["group"]["id"]
       begin 
         #bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>n.to_s }]
@@ -67,7 +67,7 @@ class Botdo
       @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"}]
     end
 
-    if smsg["text"] =~ /^>电我.*下/
+    if smsg["text"] =~ /^(\s)*>电我.*下/
       @bot.mute @msg["sender"]["group"]["id"],@msg["sender"]["id"],60
       @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"电死你！"}]
     end
@@ -115,16 +115,13 @@ class Botdo
           return
         end
       end
-
-
-
       @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>"https://pximg.rainchan.win/img?img_id="+id.to_s }]
-
-      
     rescue 
       @bot.sendGroupMessage @msg["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!.to_s }]
     end
   end
+
+  
 
 
 
