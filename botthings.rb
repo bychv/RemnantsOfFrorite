@@ -4,13 +4,13 @@ class Botthings
 include Kisaki
   def initialize bot
     @bot = bot
+    ksk_initialize
   end
 
   def msgtype msg
     @msg = msg
     msg.each do |sev|
       pp @sev = sev
-      
       
 
       if sev["type"] == "NudgeEvent"
@@ -27,18 +27,28 @@ include Kisaki
     
   end#of msgtype
 
+  def isok?()
+    if @sev["sender"]["id"] == @bot.admin
+      return true
+    end
+    return false
+  end
+
 
   def grpmsghandle 
     @cmdhashsc = {
       "/about" =>{:method=>:about,:permission=>true},
       "/kkpabout"=>{:method=>:kkpabout,:permission=>true}
     }
-
+    
     @cmdhashre = {
       "^透.*" =>{:method=>:tou,:permission=>true},
       "^(\s)*>电我.*下"=>{:method=>:dwxx,:permission=>true},
       "^(\s)*\/fudu(\s)*.*(\s)*[0-9]+$"=>{:method=>:fudu,:permission=>true},
-      "(kkp)|(涩图)|(色图)"=>{:method=>:kkp,:permission=>true}
+      "(kkp)|(涩图)|(色图)"=>{:method=>:kkp,:permission=>true},
+      "^\/pkp"=>{:method=>:pkp,:permission=>true},
+      "^\/mute.*"=>{:method=>:mutemem,:permission=>self.isok?},
+      "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?}
     }
     
     @sev["messageChain"].each do |smsg|
@@ -52,7 +62,7 @@ include Kisaki
     setvar @bot,@sev,smsg
 
     @cmdhashsc.each_key do |cmd|
-      pp smsg 
+      #pp smsg 
       if smsg["text"] =~ /^#{cmd}$/i and @cmdhashsc[cmd][:permission]
         self.send @cmdhashsc[cmd][:method]
       end #of if

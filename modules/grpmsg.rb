@@ -32,7 +32,7 @@ module Kisaki
     pp @@smsg['text']
     pp torepeat = $3
     n = $5.to_i
-    if torepeat =~ /^(\s)*\/fudu(\s)*(.*)(\s)*([0-9]+)/
+    if torepeat =~ /^(\s)*\/fudu(\s)*(.*)(\s)*([0-9]+)/ or n > 10
       return
     end
 
@@ -53,6 +53,38 @@ module Kisaki
   def mthds
     @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>Kisaki.public_methods}]
   end
+
+  def mutemem
+    pp @@sev["sender"]["group"]["id"]
+    begin
+    @@smsg['text'] =~ /\/mute(\s)+(\d+)(\s)+(\d+)/
+    memid = $2
+    time = $4
+    pp @@bot.mute @@sev["sender"]["group"]["id"],memid,time
+    rescue
+      if DEBUG
+        @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!}]
+      end
+      
+    end
+  end
+
+  def unmutemem
+    pp @@sev["sender"]["group"]["id"]
+    begin
+    @@smsg['text'] =~ /\/unmute(\s)+(\d+)/
+    memid = $2
+    
+    pp @@bot.unmute @@sev["sender"]["group"]["id"],memid
+    rescue
+      if DEBUG
+        @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!}]
+      end
+      
+    end
+  end
+
+    
 
 
   

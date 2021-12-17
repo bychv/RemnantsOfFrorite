@@ -3,7 +3,7 @@ require 'toml-rb'
 require './modules/miraihttpapi.rb'
 require './botthings'
 
-
+DEBUG = false
 path = File.join(File.dirname(__FILE__), 'config.toml')
 pp config = TomlRB.load_file(path)
 
@@ -20,7 +20,7 @@ while true
   resp['data'].uniq!
   things.msgtype resp['data']
   rescue
-    
+    pp $!
   end
 end
 

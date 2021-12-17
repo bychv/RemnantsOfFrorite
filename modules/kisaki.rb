@@ -4,10 +4,10 @@ require_relative 'grpmsg'
 require_relative 'kkp'
 
 module Kisaki
-def ksk_initialize
-  
-  kkpinit
-end
+  #init module
+  def ksk_initialize
+    kkpinit
+  end
 
   def setvar bot,sev,smsg
     @@bot = bot
