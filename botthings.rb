@@ -2,9 +2,11 @@ require './modules/kisaki.rb'
 
 class Botthings 
 include Kisaki
-  def initialize bot
+  def initialize bot,bgm_token
     @bot = bot
-    ksk_initialize
+    ksk_initialize bgm_token
+    @lastmsg = ''
+    @lastrepeatedmsg = '2'
   end
 
   def msgtype msg
@@ -34,11 +36,12 @@ include Kisaki
     return false
   end
 
-
+    
   def grpmsghandle 
     @cmdhashsc = {
       "/about" =>{:method=>:about,:permission=>true},
-      "/kkpabout"=>{:method=>:kkpabout,:permission=>true}
+      "/kkpabout"=>{:method=>:kkpabout,:permission=>true},
+      "/bgmhelp"=>{:method=>:bangumi_help,:permission=>true}
     }
     
     @cmdhashre = {
@@ -48,7 +51,10 @@ include Kisaki
       "(kkp)|(涩图)|(色图)"=>{:method=>:kkp,:permission=>true},
       "^\/pkp"=>{:method=>:pkp,:permission=>true},
       "^\/mute.*"=>{:method=>:mutemem,:permission=>self.isok?},
-      "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?}
+      "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?},
+      "^.+牛子"=>{:method=>:automute,:permission=>!isok?},
+      "^/bgmi"=>{:method=>:get_bangumi_subject,:permission=>true},
+      "^/bgms"=>{:method=>:search_bangumi_subject,:permission=>true}
     }
     
     @sev["messageChain"].each do |smsg|
@@ -60,7 +66,18 @@ include Kisaki
 
   def grpsinglemsg smsg
     setvar @bot,@sev,smsg
+    
+    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg
+      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
+      @lastrepeatedmsg = @lastmsg
+    end
 
+    if smsg["type"] == "Plain"
+      @lastmsg = smsg['text']
+    end
+    
+      
+    
     @cmdhashsc.each_key do |cmd|
       #pp smsg 
       if smsg["text"] =~ /^#{cmd}$/i and @cmdhashsc[cmd][:permission]

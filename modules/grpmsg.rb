@@ -84,7 +84,14 @@ module Kisaki
     end
   end
 
-    
+    def automute
+      pp @@sev["sender"]["group"]["id"]
+      begin
+        pp @@bot.mute @@sev["sender"]["group"]["id"],@@sev["sender"]["id"],3600*3
+      rescue
+        pp $!
+      end
+    end
 
 
   
