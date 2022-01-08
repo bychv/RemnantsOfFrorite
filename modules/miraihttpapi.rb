@@ -42,7 +42,7 @@ class Miraibot
     uri = URI.parse(@urli+"/verify")
     resp = post uri,data
     @sessionKey = resp["session"]
-    pp @sessionKey
+    @sessionKey
     return resp
   end
   

@@ -66,10 +66,17 @@ include Kisaki
 
   def grpsinglemsg smsg
     setvar @bot,@sev,smsg
+    if smsg["type"] == 'Source'
+      @lastmsgid = @msgid
+      @msgid = smsg['id']
+    end
+    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg and @lastmsgid != @msgid
     
-    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg
-      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
-      @lastrepeatedmsg = @lastmsg
+      #Async do
+        @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
+        
+        @lastrepeatedmsg = @lastmsg
+      #end
     end
 
     if smsg["type"] == "Plain"
@@ -87,7 +94,10 @@ include Kisaki
     re = []
     @cmdhashre.each_key do |cmd|
       if smsg["text"] =~ /#{cmd}/i and @cmdhashre[cmd][:permission]
-            re = self.send @cmdhashre[cmd][:method]
+        Thread.new do
+          re = self.send @cmdhashre[cmd][:method]
+        end
+            
       end
     end#of cmdre
   end

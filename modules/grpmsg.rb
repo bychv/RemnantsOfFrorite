@@ -5,7 +5,7 @@ module Kisaki
   def about 
     rbver = "ruby #{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
     pp miraiver = "mirai-http-api:"+@@bot.version
-    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"+"Kisaki version:0.0.2"}]
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"+"Kisaki version:0.0.3"}]
   end
 
   def tou

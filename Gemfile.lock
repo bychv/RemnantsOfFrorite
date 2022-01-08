@@ -1,0 +1,25 @@
+GEM
+  remote: https://mirrors.ustc.edu.cn/rubygems/
+  specs:
+    async (1.30.1)
+      console (~> 1.10)
+      nio4r (~> 2.3)
+      timers (~> 4.1)
+    citrus (3.0.2)
+    console (1.14.0)
+      fiber-local
+    fiber-local (1.0.0)
+    nio4r (2.5.8)
+    timers (4.3.3)
+    toml-rb (2.1.0)
+      citrus (~> 3.0, > 3.0)
+
+PLATFORMS
+  x64-mingw-ucrt
+
+DEPENDENCIES
+  async (~> 1.30.1)
+  toml-rb
+
+BUNDLED WITH
+   2.3.3
