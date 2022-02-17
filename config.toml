@@ -1,0 +1,4 @@
+bot = 12345678 #bot qq
+admin = 23456789 #管理员qq
+verify = 'xxxxxxx' #mirai api http verify
+bgm_token = 'bgm token'
