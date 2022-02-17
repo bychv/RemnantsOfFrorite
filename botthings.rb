@@ -52,9 +52,10 @@ include Kisaki
       "^\/pkp"=>{:method=>:pkp,:permission=>true},
       "^\/mute.*"=>{:method=>:mutemem,:permission=>self.isok?},
       "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?},
-      "^.+牛子"=>{:method=>:automute,:permission=>!isok?},
+      "^.+牛子"=>{:method=>:automute,:permission=>false},
       "^/bgmi"=>{:method=>:get_bangumi_subject,:permission=>true},
-      "^/bgms"=>{:method=>:search_bangumi_subject,:permission=>true}
+      "^/bgms"=>{:method=>:search_bangumi_subject,:permission=>true},
+      "^/点歌"=>{:method=>:getmusic, :permission=>true}
     }
     
     @sev["messageChain"].each do |smsg|
@@ -70,7 +71,7 @@ include Kisaki
       @lastmsgid = @msgid
       @msgid = smsg['id']
     end
-    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg and @lastmsgid != @msgid
+    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg and @lastmsgid != @msgid and @lastmsg =~ /\S/
     
       #Async do
         @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
@@ -94,9 +95,9 @@ include Kisaki
     re = []
     @cmdhashre.each_key do |cmd|
       if smsg["text"] =~ /#{cmd}/i and @cmdhashre[cmd][:permission]
-        Thread.new do
+        #Thread.new do
           re = self.send @cmdhashre[cmd][:method]
-        end
+        #end
             
       end
     end#of cmdre

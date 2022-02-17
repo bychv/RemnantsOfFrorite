@@ -86,6 +86,7 @@ module Kisaki
 
     def automute
       pp @@sev["sender"]["group"]["id"]
+      sleep(99)
       begin
         pp @@bot.mute @@sev["sender"]["group"]["id"],@@sev["sender"]["id"],3600*3
       rescue
@@ -93,6 +94,21 @@ module Kisaki
       end
     end
 
+    def getmusic
+      getmusichelp = <<END
+#音乐 关键词
+自动搜索所有源以找出来找最佳音频来源
+
+#QQ 关键词: 搜索QQ音乐
+#网易 关键词: 搜索网易云音乐
+#网易电台 关键词: 搜索网易云电台，一般来说是直接选择找到的第一个节目，但是关键词可以以 “电台名称|节目名称”的格式指定电台节目
+##酷狗 关键词: 搜索酷狗音乐
+#千千 关键词: 搜索千千音乐（百度音乐）
+      
+More: https://github.com/khjxiaogu/MiraiSongPlugin/releases/tag/v1.1.7#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4
+END
+      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>getmusichelp}]
+    end
 
   
 end
