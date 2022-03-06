@@ -5,7 +5,7 @@ module Kisaki
   def about 
     rbver = "ruby #{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
     pp miraiver = "mirai-http-api:"+@@bot.version
-    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"+"Kisaki version:0.0.3"}]
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>miraiver+"\n"+rbver+"\n"+"Kisaki version:0.0.5"}]
   end
 
   def tou
@@ -60,7 +60,7 @@ module Kisaki
     @@smsg['text'] =~ /\/mute(\s)+(\d+)(\s)+(\d+)/
     memid = $2
     time = $4
-    pp @@bot.mute @@sev["sender"]["group"]["id"],memid,time
+    pp @@bot.mute @@sev["sender"]["group"]["id"],memid.to_i,time
     rescue
       if DEBUG
         @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>$!}]
@@ -110,5 +110,13 @@ END
       @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>getmusichelp}]
     end
 
-  
+
+    def cmdlist
+      cmdlist = String.new
+      @cmdhashre.each_key do |cmd|
+        cmdlist += "#{cmd}:#{@cmdhashre[cmd][:permission]}\n"
+      end
+      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>cmdlist}]
+    end
+    
 end

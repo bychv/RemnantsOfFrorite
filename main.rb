@@ -14,7 +14,7 @@ bot.verify config['verify']
 bot.bind config["bot"].to_i
 bot.setAdmin config["admin"].to_i
 
-things = Botthings.new bot,bgm_token
+things = Botthings.new bot,bgm_token,config["rbqg"]
 
 while true
   begin

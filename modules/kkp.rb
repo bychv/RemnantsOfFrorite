@@ -7,7 +7,7 @@ module Kisaki
   def kkpinit
     @pixivsource = "https://api.lolicon.app/setu/v2"
     @pixivproxy = "i.pixiv.re"
-    @pretags = ["萝莉","少女","黑丝","白丝","百合",'泳装',"伪娘",'眼镜娘',"白发","银发","黑发","兽耳","猫娘","正太" ]
+    @pretags = ["萝莉","少女","黑丝","白丝","百合",'泳装',"伪娘",'眼镜娘',"白发","银发","黑发","兽耳","猫娘","东方" ]
   end
 
   def kkp

@@ -2,9 +2,9 @@ require './modules/kisaki.rb'
 
 class Botthings 
 include Kisaki
-  def initialize bot,bgm_token
+  def initialize bot,bgm_token,rbqg
     @bot = bot
-    ksk_initialize bgm_token
+    ksk_initialize bgm_token,rbqg
     @lastmsg = ''
     @lastrepeatedmsg = '2'
   end
@@ -19,7 +19,7 @@ include Kisaki
         onnuget @bot,@sev
       end
       
-      if sev['type'] == "GroupMessage"
+      if sev['type'] == "GroupMessage" or sev['type']  == "GroupSyncMessage"
         grpmsghandle 
       end
       if sev['type'] == "MemberMuteEvent"
@@ -27,13 +27,21 @@ include Kisaki
       end
     end#of each do
     
-  end#of msgtype
+  end#of msgtype  
 
+  #permission
   def isok?()
     if @sev["sender"]["id"] == @bot.admin
       return true
     end
     return false
+  end
+
+  def isrbqg?
+    if @sev["sender"]["group"]["id"] == @rbqg #and Time.now.to_i%5 == 1# or @@sev["sender"]["group"]["id"] == 621080379
+      return true
+    end
+    false
   end
 
     
@@ -53,9 +61,13 @@ include Kisaki
       "^\/mute.*"=>{:method=>:mutemem,:permission=>self.isok?},
       "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?},
       "^.+牛子"=>{:method=>:automute,:permission=>false},
-      "^/bgmi"=>{:method=>:get_bangumi_subject,:permission=>true},
-      "^/bgms"=>{:method=>:search_bangumi_subject,:permission=>true},
-      "^/点歌"=>{:method=>:getmusic, :permission=>true}
+      "^/bgmi"=>{:method=>:get_bangumi_subject,:permission=>false},
+      "^/bgms"=>{:method=>:search_bangumi_subject,:permission=>false},
+      "^/点歌"=>{:method=>:getmusic, :permission=>true},
+      "^/cmdlist"=>{:method=>:cmdlist, :permission=>true},
+      "^/aghxb"=>{:method=>:anghxxb, :permission=>true},
+      "^/help"=>{:method=>:kskhelp, :permission=>true},
+      "剑选"=>{:method=>:jianxuan,:permission=>self.isrbqg?}
     }
     
     @sev["messageChain"].each do |smsg|
@@ -77,6 +89,7 @@ include Kisaki
         @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
         
         @lastrepeatedmsg = @lastmsg
+        
       #end
     end
 
