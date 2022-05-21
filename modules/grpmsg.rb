@@ -17,7 +17,16 @@ module Kisaki
     ensure
       return re
     end
-      
+  end
+  def leipu
+    tt = @@smsg["text"][2...]
+    pp @@sev["sender"]["group"]["id"]
+    begin
+        re = @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>tt+"，透！！！" }]
+    rescue
+    ensure
+      return re
+    end
   end
 
   def dwxx #电我x下

@@ -95,12 +95,27 @@ module Kisaki
 
   end
 
+
+
   def httppost uri,data
     uri = URI.parse uri
     datajson = JSON.generate(data)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.request_uri, 
+      'Content-Type' => 'application/json')
+    request.body = datajson
+    resp = http.request(request)
+    return JSON.parse(resp.body)
+  end
+
+  def hcy_search query
+    uri = URI.parse('https://api.acgmx.com/public/search')
+    uri.query = 
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Get.new(uri.request_uri, 
+      'token'=>@kskconf['hcy_token'],
       'Content-Type' => 'application/json')
     request.body = datajson
     resp = http.request(request)

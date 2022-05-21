@@ -13,7 +13,7 @@ module Kisaki
     @bangumi = Bangumi.new bgm_token
     @rbqg = rbqg
     aghxbinit
-
+    helpinit
   end
 
   def setvar bot,sev,smsg

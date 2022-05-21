@@ -1,12 +1,15 @@
 require './modules/kisaki.rb'
 
+
 class Botthings 
 include Kisaki
-  def initialize bot,bgm_token,rbqg
+  def initialize bot,bgm_token,rbqg,kskconf
     @bot = bot
     ksk_initialize bgm_token,rbqg
-    @lastmsg = ''
-    @lastrepeatedmsg = '2'
+    @lastmsg = {:plain=>'', :image=>''}
+    @lastrepeatedmsg = {:plain=>'2', :image=>'3'}
+    @jxtimev = Hash.new
+    @kskconf = kskconf
   end
 
   def msgtype msg
@@ -38,8 +41,19 @@ include Kisaki
   end
 
   def isrbqg?
-    if @sev["sender"]["group"]["id"] == @rbqg #and Time.now.to_i%5 == 1# or @@sev["sender"]["group"]["id"] == 621080379
-      return true
+    if @sev["sender"]["group"]["id"] == @rbqg #and # or @@sev["sender"]["group"]["id"] == 621080379
+      nowhour = Time.now.hour.to_s
+      @jxtimev[nowhour] ||= {:d=>Time.now.day,:t=>0}
+      if @jxtimev[nowhour][:d] != Time.now.day 
+        @jxtimev[nowhour][:t] = 0
+        @jxtimev[nowhour][:d] = Time.now.day 
+      end
+      
+      if @jxtimev[Time.now.hour.to_s][:t] < 4
+        return true
+      end
+
+      
     end
     false
   end
@@ -53,10 +67,11 @@ include Kisaki
     }
     
     @cmdhashre = {
-      "^透.*" =>{:method=>:tou,:permission=>true},
+      "^(透).*" =>{:method=>:tou,:permission=>true},
+      "^((雷普)).*" =>{:method=>:leipu,:permission=>true},
       "^(\s)*>电我.*下"=>{:method=>:dwxx,:permission=>true},
       "^(\s)*\/fudu(\s)*.*(\s)*[0-9]+$"=>{:method=>:fudu,:permission=>true},
-      "(kkp)|(涩图)|(色图)"=>{:method=>:kkp,:permission=>true},
+      "(kkp)|(涩图)|(色图)|(kknd)|(can can need)"=>{:method=>:kkp,:permission=>true},
       "^\/pkp"=>{:method=>:pkp,:permission=>true},
       "^\/mute.*"=>{:method=>:mutemem,:permission=>self.isok?},
       "^\/unmute.*"=>{:method=>:unmutemem,:permission=>self.isok?},
@@ -67,7 +82,11 @@ include Kisaki
       "^/cmdlist"=>{:method=>:cmdlist, :permission=>true},
       "^/aghxb"=>{:method=>:anghxxb, :permission=>true},
       "^/help"=>{:method=>:kskhelp, :permission=>true},
-      "剑选"=>{:method=>:jianxuan,:permission=>self.isrbqg?}
+      "剑选|一眼丁真"=>{:method=>:jianxuan,:permission=>self.isrbqg?},
+      "以赝顶真"=>{:method=>:jianxuanad,:permission=>self.isrbqgad?},
+      "剑宝选集状态"=>{:method=>:jxstatus,:permission=>true},
+      "^/jxcc"=>{:method=>:clear_jx_count,:permission=>self.isok?},
+      "^一眼丁真"=>{:method=>:dingzhen,:permission=>self.yydzok?}
     }
     
     @sev["messageChain"].each do |smsg|
@@ -79,25 +98,48 @@ include Kisaki
 
   def grpsinglemsg smsg
     setvar @bot,@sev,smsg
+    #auto repeat
+    begin
+    autorepeatth = Thread.new do
     if smsg["type"] == 'Source'
       @lastmsgid = @msgid
       @msgid = smsg['id']
     end
-    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg and @lastmsg != @lastrepeatedmsg and @lastmsgid != @msgid and @lastmsg =~ /\S/
+    if smsg["type"] == "Plain" and smsg['text'] == @lastmsg[:plain] and @lastmsg[:plain] != @lastrepeatedmsg[:plain] and @lastmsgid != @msgid and @lastmsg[:plain] =~ /\S/
     
       #Async do
-        @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>@lastmsg}]
+      thisiscmd = true
+      @cmdhashsc.each_key do |cmd|
+        #pp smsg 
+        if smsg["text"] =~ /^#{cmd}$/i 
+          thisiscmd = false
+        end #of if
+      end #of cmdhashsc
+      re = []
+      @cmdhashre.each_key do |cmd|
+        if smsg["text"] =~ /#{cmd}/i 
+          #Thread.new do
+          thisiscmd = false
+          #end
+        end      
+      end
+      if thisiscmd 
+        torepeat = @sev['messageChain'][1..]
+        @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],torepeat
         
-        @lastrepeatedmsg = @lastmsg
+        @lastrepeatedmsg[:plain] = @lastmsg[:plain]
+      end
+        
         
       #end
     end
 
     if smsg["type"] == "Plain"
-      @lastmsg = smsg['text']
+      @lastmsg[:plain] = smsg['text']
     end
-    
-      
+    end #of thread
+    end #of begin
+    #auto repeat end
     
     @cmdhashsc.each_key do |cmd|
       #pp smsg 
@@ -114,7 +156,9 @@ include Kisaki
             
       end
     end#of cmdre
+    autorepeatth.join()
   end
+  
   
   def unmutemember
     if @sev["member"]["id"] == @bot.admin

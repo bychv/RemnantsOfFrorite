@@ -18,10 +18,16 @@ module Kisaki
   end
 
   def kskhelp
-    if @cmdhelp == nil then helpinit end
+    helpinit
     helpstr = "指令以正则方式呈现\n"
     @cmdhelp.each_key do |cmd|
+      pp cmd
+      begin
       helpstr += "/#{cmd}/:#{@cmdhelp[cmd][:help]},权限:#{@cmdhashre[cmd][:permission]}\n"
+      rescue
+        pp cmd
+        pp $!
+      end
     end
     @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>helpstr}]
   end
