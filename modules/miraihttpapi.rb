@@ -394,8 +394,6 @@ class Miraibot
     return JSON.parse(resp.body)
   end
   
-  
-
   private :get,:post
 end
 

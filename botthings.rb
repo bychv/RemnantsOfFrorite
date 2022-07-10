@@ -5,7 +5,7 @@ class Botthings
 include Kisaki
   def initialize bot,bgm_token,rbqg,kskconf
     @bot = bot
-    ksk_initialize bgm_token,rbqg
+    ksk_initialize bgm_token,rbqg,kskconf
     @lastmsg = {:plain=>'', :image=>''}
     @lastrepeatedmsg = {:plain=>'2', :image=>'3'}
     @jxtimev = Hash.new
@@ -67,8 +67,8 @@ include Kisaki
     }
     
     @cmdhashre = {
-      "^(透).*" =>{:method=>:tou,:permission=>true},
-      "^((雷普)).*" =>{:method=>:leipu,:permission=>true},
+      "^\s*(透).*" =>{:method=>:tou,:permission=>true},
+      "^\s*((雷普)).*" =>{:method=>:leipu,:permission=>true},
       "^(\s)*>电我.*下"=>{:method=>:dwxx,:permission=>true},
       "^(\s)*\/fudu(\s)*.*(\s)*[0-9]+$"=>{:method=>:fudu,:permission=>true},
       "(kkp)|(涩图)|(色图)|(kknd)|(can can need)"=>{:method=>:kkp,:permission=>true},
@@ -82,11 +82,13 @@ include Kisaki
       "^/cmdlist"=>{:method=>:cmdlist, :permission=>true},
       "^/aghxb"=>{:method=>:anghxxb, :permission=>true},
       "^/help"=>{:method=>:kskhelp, :permission=>true},
-      "剑选|一眼丁真"=>{:method=>:jianxuan,:permission=>self.isrbqg?},
-      "以赝顶真"=>{:method=>:jianxuanad,:permission=>self.isrbqgad?},
+      "剑选|一眼丁真|以赝顶真"=>{:method=>:jianxuan,:permission=>self.isrbqg?},
+      "以赝顶真|剑选"=>{:method=>:jianxuanad,:permission=>self.isrbqgad?},
       "剑宝选集状态"=>{:method=>:jxstatus,:permission=>true},
       "^/jxcc"=>{:method=>:clear_jx_count,:permission=>self.isok?},
-      "^一眼丁真"=>{:method=>:dingzhen,:permission=>self.yydzok?}
+      "^一眼丁真"=>{:method=>:dingzhen,:permission=>self.yydzok?},
+      "/latex"=>{:method=>:latexredering, :permission=>true},
+      "saucenao|搜图"=>{:method=>:saunao, :permission=>true}
     }
     
     @sev["messageChain"].each do |smsg|

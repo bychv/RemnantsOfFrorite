@@ -31,4 +31,6 @@ module Kisaki
     end
     @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>helpstr}]
   end
+
+  
 end

@@ -6,7 +6,7 @@ require 'json'
 module Kisaki
   def kkpinit
     @pixivsource = "https://api.lolicon.app/setu/v2"
-    @pixivproxy = "i.pixiv.re"
+    @pixivproxy = "piximg.lowwevx.link" #"i.pixiv.re"
     @pretags = ["萝莉","少女","黑丝","白丝","百合",'泳装',"伪娘",'眼镜娘',"白发","银发","黑发","兽耳","猫娘","东方" ]
   end
 
@@ -29,15 +29,21 @@ module Kisaki
       "size" => "regular"
     }
     apiresp = Hash.new
-    t1 = Thread.new do
+    begin
     apiresp = httppost pixivsource,pixiv_api_arg
+    rescue
+      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"#{$!}" }]
+      return
     end
-    t1.join()
     pp apiresp["data"][0]["tags"]
     picurl = apiresp["data"][0]["urls"]["regular"]
+    picauthor =  apiresp["data"][0]["author"]
+    pictitle = apiresp["data"][0]["title"]
+    picpid = apiresp["data"][0]["pid"]
     pp picurl,tag
     Async do
     @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Image", "url"=>picurl }]
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"以下是作者和pid\n#{picauthor}:[#{picpid}]" }]
     end
   end #of kkp
   
@@ -64,11 +70,15 @@ module Kisaki
     }
     apiresp = Hash.new
     t1 = Thread.new do
+    
     apiresp = httppost pixivsource,pixiv_api_arg
     end
     t1.join()
     begin
       picurl = apiresp["data"][0]["urls"]["regular"]
+      picauthor =  apiresp["data"][0]["author"]
+      pictitle = apiresp["data"][0]["title"]
+      picpid = apiresp["data"][0]["pid"]
       msgcc = [
         # {
         # "type"=>"Quote",
@@ -91,6 +101,7 @@ module Kisaki
     
     Async do
     @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],msgcc
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"以下是作者和pid\n#{picauthor}:[#{picpid}]" }]
     end
 
   end

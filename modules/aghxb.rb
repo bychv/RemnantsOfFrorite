@@ -55,7 +55,8 @@ module Kisaki
         @jxtimev[nowhour][:d] = Time.now.day 
       end
       p = @aghxb.get_jianxuan
-      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Image", "base64"=>p}]
+      @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"🗡定为:" },{ "type"=>"Image", "base64"=>p}]
+      
     end
   end
 
@@ -70,10 +71,10 @@ module Kisaki
 
   def jianxuanad
     p = @aghxb.get_jianxuan
-    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Image", "base64"=>p}]
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Plain", "text"=>"🗡定为:" },{ "type"=>"Image", "base64"=>p}]
   end
   def isrbqgad?
-    if @sev["sender"]["group"]["id"] == @rbqg and @sev["sender"]["id"] == @bot.admin
+    if @sev["sender"]["group"]["id"] == @rbqg and @sev["sender"]["id"] == @bot.admin and !self.isrbqg?
       return true
     end
     return false
@@ -83,7 +84,8 @@ module Kisaki
     p = @aghxb.get_dingzhen
     #w = File.new("base64","w")
     #w.syswrite(p)
-    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[{ "type"=>"Image", "base64"=>p}]
+
+    @@bot.sendGroupMessage @@sev["sender"]["group"]["id"],[ { "type"=>"Image", "base64"=>p}]
   end
   def yydzok?
     if @sev["sender"]["group"]["id"] == @rbqg
@@ -91,4 +93,6 @@ module Kisaki
     end
     true
   end
+
+  
 end
