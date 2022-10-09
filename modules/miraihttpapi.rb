@@ -42,7 +42,7 @@ class Miraibot
     uri = URI.parse(@urli+"/verify")
     resp = post uri,data
     @sessionKey = resp["session"]
-    @sessionKey
+    pp @sessionKey
     return resp
   end
   
@@ -51,13 +51,13 @@ class Miraibot
     if @sessionKey == "SINGLE_SESSION"
       return
     end
-    data = {:sessionkey=>@sessionKey,:qq=>@qq}
+    data = {:sessionKey=>@sessionKey,:qq=>qq}
     uri = URI.parse(@urli+"/bind")
     return post uri,data
   end
 
   def release qq
-    data = {:sessionkey=>@sessionKey,:qq=>qq}
+    data = {:sessionKey=>@sessionKey,:qq=>qq}
     uri = URI.parse(@urli+"/release")
     return post uri,data
   end
@@ -90,8 +90,8 @@ class Miraibot
   end
   
   #缓存操作
-  def messageFromId id
-    uri = URI.parse(@urli+"/messageFromId?sessionKey=#{@sessionKey}&id=#{id}")
+  def messageFromId id,target
+    uri = URI.parse(@urli+"/messageFromId?sessionKey=#{@sessionKey}&messageId=#{id}&target=#{target}")
     return get uri,{}
   end
 
@@ -124,31 +124,31 @@ class Miraibot
 # 消息发送与撤回
 
   def sendFriendMessage target,msgc
-    data = {:sessionkey=>@sessionKey,:target=>target,:messageChain=>msgc}
+    data = {:sessionKey=>@sessionKey,:target=>target,:messageChain=>msgc}
     uri = URI.parse(@urli+"/sendFriendMessage")
     return post uri,data
   end
 
   def sendGroupMessage target,msgc
-    data = {:sessionkey=>@sessionKey,:target=>target,:messageChain=>msgc}
+    data = {:sessionKey=>@sessionKey,:target=>target,:messageChain=>msgc}
     uri = URI.parse(@urli+"/sendGroupMessage")
     return post uri,data
   end
 
   def sendTempMessage qq,group,msgc
-    data = {:sessionkey=>@sessionKey,:qq=>qq,:group=>group,:messageChain=>msgc}
+    data = {:sessionKey=>@sessionKey,:qq=>qq,:group=>group,:messageChain=>msgc}
     uri = URI.parse(@urli+"/sendTempMessage")
     return post uri,data
   end
 
   def sendNudge target,subject,kind
-    data = {:sessionkey=>@sessionKey,:target=>target,:subject=>subject,:kind=>kind}
+    data = {:sessionKey=>@sessionKey,:target=>target,:subject=>subject,:kind=>kind}
     uri = URI.parse(@urli+"/sendNudge")
     return post uri,data
   end
 
   def recall target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/recall")
     return post uri,data
   end
@@ -255,7 +255,7 @@ class Miraibot
   #账号管理
 
   def deleteFriend target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/deleteFriend")
     return post uri,data
   end
@@ -263,56 +263,56 @@ class Miraibot
   #群管理
 
   def mute target,memberId,time=0
-    data = {:sessionkey=>@sessionKey,:target=>target,:memberId=>memberId,:time=>time}
+    data = {:sessionKey=>@sessionKey,:target=>target,:memberId=>memberId,:time=>time}
     uri = URI.parse(@urli+"/mute")
     return post uri,data
   end
 
   def unmute target,memberId
-    data = {:sessionkey=>@sessionKey,:target=>target,:memberId=>memberId}
+    data = {:sessionKey=>@sessionKey,:target=>target,:memberId=>memberId}
     uri = URI.parse(@urli+"/unmute")
     return post uri,data
   end
 
   def kick target,memberId,msg=""
-    data = {:sessionkey=>@sessionKey,:target=>target,:memberId=>memberId,:msg=>msg}
+    data = {:sessionKey=>@sessionKey,:target=>target,:memberId=>memberId,:msg=>msg}
     uri = URI.parse(@urli+"/kick")
     return post uri,data
   end
 
   def quit target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/quit")
     return post uri,data
   end
 
   def muteAll target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/muteAll")
     return post uri,data
   end
 
   def unmuteAll target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/unmuteAll")
     return post uri,data
   end
 
   def setEssence target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/setEssence")
     return post uri,data
   end
 
   def getGroupConfig target
-    data = {:sessionkey=>@sessionKey,:target=>target}
+    data = {:sessionKey=>@sessionKey,:target=>target}
     uri = URI.parse(@urli+"/groupConfig?sessionKey=#{@sessionKey}&target=#{target}")
     return get uri,data
   end
 
   def setGroupConfig target,config,name,announcement,confessTalk,allowMemberInvite,autoApprove,anonymousChat
     data = {
-      :sessionkey=>@sessionKey,
+      :sessionKey=>@sessionKey,
       :target=>target,
       :config=>config,
       :name=>name,
@@ -332,7 +332,7 @@ class Miraibot
 
   def setMemberInfo target,memberId,name,specialTitle
     data = {
-      :sessionkey=>@sessionKey,
+      :sessionKey=>@sessionKey,
       :target=>target,
       :memberId=>memberId,
       :info=>{
@@ -346,7 +346,7 @@ class Miraibot
 
   def memberAdmin target,memberId,assign
     data = {
-      :sessionkey=>@sessionKey,
+      :sessionKey=>@sessionKey,
       :target=>target,
       :memberId=>memberId,
       :assign=>assign
@@ -385,7 +385,6 @@ class Miraibot
 
   def post uri,data
     datajson = JSON.generate(data)
-
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.request_uri, 
       'Content-Type' => 'application/json')
